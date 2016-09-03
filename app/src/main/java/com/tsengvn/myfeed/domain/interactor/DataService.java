@@ -38,10 +38,6 @@ public class DataService {
         this.imgurRepo = imgurRepo;
     }
 
-    public Observable<List<Post>> loadPost(int start) {
-        return postRepo.getPost(0, 0);
-    }
-
     public Observable<List<Image>> loadImages(int page) {
         return imgurRepo.getRandomImage(page)
                 .flatMap(new Func1<Image.List, Observable<Image>>() {
@@ -56,12 +52,15 @@ public class DataService {
                         return !image.isAnimated() && !image.isAlbum();
                     }
                 })
-                .toList();
+                .toList()
+                .single()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
 
     }
 
-    public void addPost(String text, String imgUrl) {
-        Post post = new Post(text, imgUrl, System.currentTimeMillis());
+    public void addPost(String text, String imgUrl, float imgRatio) {
+        Post post = new Post(text, imgUrl, imgRatio, System.currentTimeMillis());
         postRepo.createPost(post);
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tsengvn.myfeed.BuildConfig;
 import com.tsengvn.myfeed.domain.interactor.DataService;
 import com.tsengvn.myfeed.domain.repo.ImgurRepo;
 import com.tsengvn.myfeed.domain.repo.PostRepo;
@@ -16,6 +17,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -57,6 +59,11 @@ public class AppModule {
     @Provides
     @Singleton
     ImgurRepo provideImgurRepo(OkHttpClient okHttpClient) {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
         return new Retrofit.Builder()
                 .baseUrl(new StringBuilder().append(ImgurRepo.URL).append("/")
                         .append(ImgurRepo.API_VERSION).append("/").toString())

@@ -18,7 +18,7 @@ public class AddPresenter extends BasePresenter<AddView> {
     }
 
 
-    public void savePost(String text, String imgUrl) {
-        dataService.addPost(text, imgUrl);
+    public void savePost(String text, String imgUrl, float imgRatio) {
+        dataService.addPost(text, imgUrl, imgRatio);
     }
 }

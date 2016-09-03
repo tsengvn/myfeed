@@ -9,11 +9,14 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
 import com.tsengvn.myfeed.R;
 import com.tsengvn.myfeed.internal.di.component.AppComponent;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.ui.base.BaseActivity;
 import com.tsengvn.myfeed.ui.base.BasePresenter;
+import com.tsengvn.myfeed.ui.gallery.GalleryActivity;
+import com.tsengvn.myfeed.ui.widget.FixedImageView;
 
 import javax.inject.Inject;
 
@@ -33,7 +36,10 @@ public class AddActivity extends BaseActivity implements AddView {
     EditText inputTextView;
 
     @BindView(R.id.image)
-    ImageView imageView;
+    FixedImageView imageView;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private Image image;
 
@@ -41,7 +47,6 @@ public class AddActivity extends BaseActivity implements AddView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -71,7 +76,9 @@ public class AddActivity extends BaseActivity implements AddView {
             finish();
             return true;
         } else if (itemId == R.id.action_save) {
-            presenter.savePost(inputTextView.getText().toString(), image != null ? image.getLink() : null);
+            presenter.savePost(inputTextView.getText().toString(),
+                    image != null ? image.getLink() : null,
+                    image != null ? image.getRatio() : 0);
             setResult(RESULT_OK);
             finish();
             return true;
@@ -87,10 +94,13 @@ public class AddActivity extends BaseActivity implements AddView {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQ_PHOTO && resultCode == RESULT_OK) {
             image = data.getParcelableExtra("image");
+            imageView.setRatio(image.getRatio());
+            Picasso.with(this).load(image.getLink()).fit().into(imageView);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void openGallery() {
+        startActivityForResult(new Intent(this, GalleryActivity.class), REQ_PHOTO);
     }
 }

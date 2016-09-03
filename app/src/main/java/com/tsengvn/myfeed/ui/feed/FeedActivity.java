@@ -86,7 +86,7 @@ public class FeedActivity extends BaseActivity implements FeedView {
     @Override
     public void showError() {
         Snackbar
-                .make(recyclerView, "Error, try again later.", Snackbar.LENGTH_LONG)
+                .make(recyclerView, "Error, try again later.", Snackbar.LENGTH_INDEFINITE)
                 .show();
     }
 
@@ -94,6 +94,7 @@ public class FeedActivity extends BaseActivity implements FeedView {
     public void onReceiveNewPosts(List<Post> posts) {
         if (feedItemAdapter == null) createAdapter();
 
+        showNewPostNotice();
         feedItemAdapter.onNewPosts(posts);
     }
 
