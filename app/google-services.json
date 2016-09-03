@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "413364621854",
+    "firebase_url": "https://myfeed-b4a00.firebaseio.com",
+    "project_id": "myfeed-b4a00",
+    "storage_bucket": "myfeed-b4a00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413364621854:android:f7b5997c3434b7bd",
+        "android_client_info": {
+          "package_name": "com.tsengvn.myfeed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "413364621854-0uom10284f96ehvck7r8h87su2cru74o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEvXPCMN2fl3K7K5eANs6uWCXUuq075zE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

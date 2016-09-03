@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyFeed</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_post">add post</string>
+    <string name="hint">What\'s on your mind?</string>
+    <string name="save">save</string>
+    <string name="new_post_message">New Post Added!</string>
+    <string name="show">Show</string>
+</resources>
