@@ -5,6 +5,8 @@ import com.tsengvn.myfeed.ui.base.BasePresenter;
 
 import javax.inject.Inject;
 
+import rx.functions.Action1;
+
 /**
  * @author : hienngo
  * @since : Sep 02, 2016.
@@ -19,6 +21,12 @@ public class AddPresenter extends BasePresenter<AddView> {
 
 
     public void savePost(String text, String imgUrl, float imgRatio) {
-        dataService.addPost(text, imgUrl, imgRatio);
+        dataService.addPost(text, imgUrl, imgRatio)
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        getView().onPostAdded();
+                    }
+                });
     }
 }

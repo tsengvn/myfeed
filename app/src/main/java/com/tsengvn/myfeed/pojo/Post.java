@@ -51,4 +51,28 @@ public class Post {
     public void setCreated(long created) {
         this.created = created;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Post)) return false;
+
+        Post post = (Post) o;
+
+        if (Float.compare(post.getImgRatio(), getImgRatio()) != 0) return false;
+        if (getCreated() != post.getCreated()) return false;
+        if (getText() != null ? !getText().equals(post.getText()) : post.getText() != null)
+            return false;
+        return getImgUrl() != null ? getImgUrl().equals(post.getImgUrl()) : post.getImgUrl() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getText() != null ? getText().hashCode() : 0;
+        result = 31 * result + (getImgUrl() != null ? getImgUrl().hashCode() : 0);
+        result = 31 * result + (getImgRatio() != +0.0f ? Float.floatToIntBits(getImgRatio()) : 0);
+        result = 31 * result + (int) (getCreated() ^ (getCreated() >>> 32));
+        return result;
+    }
 }

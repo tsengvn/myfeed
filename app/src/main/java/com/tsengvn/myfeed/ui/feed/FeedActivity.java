@@ -102,7 +102,7 @@ public class FeedActivity extends BaseActivity implements FeedView {
     @Override
     public void showNewPostNotice() {
         Snackbar
-                .make(recyclerView, R.string.new_post_message, Snackbar.LENGTH_LONG)
+                .make(recyclerView, R.string.new_post_message, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.show, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -115,7 +115,7 @@ public class FeedActivity extends BaseActivity implements FeedView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0 && resultCode == RESULT_OK) {
-            showNewPostNotice();
+//            showNewPostNotice();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

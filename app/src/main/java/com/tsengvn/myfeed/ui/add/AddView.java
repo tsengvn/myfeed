@@ -7,4 +7,5 @@ import com.tsengvn.myfeed.ui.base.BaseView;
  * @since : Sep 02, 2016.
  */
 public interface AddView extends BaseView{
+    void onPostAdded();
 }

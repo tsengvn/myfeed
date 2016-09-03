@@ -59,9 +59,19 @@ public class DataService {
 
     }
 
-    public void addPost(String text, String imgUrl, float imgRatio) {
+    public Observable<Boolean> addPost(String text, String imgUrl, float imgRatio) {
         Post post = new Post(text, imgUrl, imgRatio, System.currentTimeMillis());
-        postRepo.createPost(post);
+        return Observable.just(post)
+                .map(new Func1<Post, Boolean>() {
+                    @Override
+                    public Boolean call(Post post) {
+                        postRepo.createPost(post);
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+
     }
 
     public Subscription startSyncingPost(final long lastSyncedTime, Observer<List<Post>> observer) {
@@ -69,7 +79,9 @@ public class DataService {
             syncSubject = ReplaySubject.create();
             postRepo.addChildEventListener(childEventListener);
         }
-        return syncSubject.asObservable()
+        return syncSubject
+                .asObservable()
+                .distinct()
                 .filter(new Func1<Post, Boolean>() {
                     @Override
                     public Boolean call(Post post) {
@@ -94,7 +106,7 @@ public class DataService {
         postRepo.removeChildEventListener(childEventListener);
     }
 
-    private ChildEventListener childEventListener = new ChildEventListener() {
+    private final ChildEventListener childEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             //not support

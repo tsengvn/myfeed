@@ -19,6 +19,8 @@ import rx.Subscription;
  * @since : Sep 01, 2016.
  */
 public class FeedPresenter extends BasePresenter<FeedView> {
+    private static final String TAG = "FeedPresenter";
+
     private final DataService dataService;
 
     private Subscription subscription;
@@ -30,7 +32,7 @@ public class FeedPresenter extends BasePresenter<FeedView> {
     }
 
     public void pauseSyncing() {
-        Log.v("@nmh", "pauseSyncing");
+        Log.v(TAG, "pauseSyncing");
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
             subscription = null;
@@ -39,7 +41,7 @@ public class FeedPresenter extends BasePresenter<FeedView> {
 
     public void resumeSyncing() {
         if (subscription != null) return;
-        Log.v("@nmh", "resumeSyncing");
+        Log.v(TAG, "resumeSyncing");
 
         subscription = dataService.startSyncingPost(lastSyncedTime, new Subscriber<List<Post>>() {
             @Override
@@ -53,18 +55,21 @@ public class FeedPresenter extends BasePresenter<FeedView> {
 
             @Override
             public void onNext(List<Post> posts) {
-                Log.v("@nmh", "new post : " + posts.size());
+                Log.v(TAG, "new post : " + posts.size());
                 Collections.reverse(posts);
+                if (lastSyncedTime != 0) {
+                    getView().showNewPostNotice();
+                }
                 lastSyncedTime = posts.get(0).getCreated();
                 getView().onReceiveNewPosts(posts);
-                getView().showNewPostNotice();
             }
         });
     }
 
     public void stopSyncing() {
-        Log.v("@nmh", "stopSyncing");
         pauseSyncing();
+        Log.v(TAG, "stopSyncing");
+
         lastSyncedTime = 0;
         dataService.stopSyncingPost();
     }

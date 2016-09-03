@@ -79,8 +79,6 @@ public class AddActivity extends BaseActivity implements AddView {
             presenter.savePost(inputTextView.getText().toString(),
                     image != null ? image.getLink() : null,
                     image != null ? image.getRatio() : 0);
-            setResult(RESULT_OK);
-            finish();
             return true;
         } else if (itemId == R.id.action_photo) {
             openGallery();
@@ -102,5 +100,11 @@ public class AddActivity extends BaseActivity implements AddView {
 
     private void openGallery() {
         startActivityForResult(new Intent(this, GalleryActivity.class), REQ_PHOTO);
+    }
+
+    @Override
+    public void onPostAdded() {
+        setResult(RESULT_OK);
+        finish();
     }
 }
