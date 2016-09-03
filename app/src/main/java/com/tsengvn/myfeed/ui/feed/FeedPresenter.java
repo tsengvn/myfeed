@@ -57,6 +57,7 @@ public class FeedPresenter extends BasePresenter<FeedView> {
                 Collections.reverse(posts);
                 lastSyncedTime = posts.get(0).getCreated();
                 getView().onReceiveNewPosts(posts);
+                getView().showNewPostNotice();
             }
         });
     }

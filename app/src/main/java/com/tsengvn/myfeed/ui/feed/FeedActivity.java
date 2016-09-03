@@ -30,6 +30,9 @@ public class FeedActivity extends BaseActivity implements FeedView {
     @BindView(R.id.fab)
     FloatingActionButton floatButton;
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @Inject
     FeedPresenter feedPresenter;
 
@@ -62,7 +65,6 @@ public class FeedActivity extends BaseActivity implements FeedView {
     }
 
     private void bindViews() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         floatButton.setOnClickListener(new View.OnClickListener() {
@@ -94,10 +96,10 @@ public class FeedActivity extends BaseActivity implements FeedView {
     public void onReceiveNewPosts(List<Post> posts) {
         if (feedItemAdapter == null) createAdapter();
 
-        showNewPostNotice();
         feedItemAdapter.onNewPosts(posts);
     }
 
+    @Override
     public void showNewPostNotice() {
         Snackbar
                 .make(recyclerView, R.string.new_post_message, Snackbar.LENGTH_LONG)

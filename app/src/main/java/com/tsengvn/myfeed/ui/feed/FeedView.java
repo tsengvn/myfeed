@@ -12,5 +12,7 @@ import java.util.List;
 public interface FeedView extends BaseView{
     void onReceiveNewPosts(List<Post> posts);
 
+    void showNewPostNotice();
+
     void showError();
 }
