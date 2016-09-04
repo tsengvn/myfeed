@@ -1,13 +1,11 @@
 package com.tsengvn.myfeed.domain.repo;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.tsengvn.myfeed.pojo.Post;
 
@@ -17,10 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.ReplaySubject;
 
 /**
  * @author : hienngo
@@ -48,7 +43,7 @@ public class PostRepo {
         firebase.removeEventListener(childEventListener);
     }
 
-    public void createPost(Post post) {
+    public void createPost(final Post post) {
         firebase.push().setValue(post);
     }
 
@@ -89,5 +84,9 @@ public class PostRepo {
                 });
             }
         });
+    }
+
+    public void remove(Post post) {
+        firebase.child(post.getKey()).removeValue();
     }
 }

@@ -2,11 +2,9 @@ package com.tsengvn.myfeed.ui.feed;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -25,13 +23,16 @@ import butterknife.ButterKnife;
  * @since : Sep 01, 2016.
  */
 public class FeedItemAdapter extends RecyclerView.Adapter<FeedItemAdapter.ViewHolder> {
-    private List<Post> posts;
+    private volatile List<Post> posts;
     private LayoutInflater layoutInflater;
     private Context context;
+    private OnItemLongClickListener itemLongClickListener;
+
     public FeedItemAdapter(Context context) {
         this.posts = new ArrayList<>();
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
+        Picasso.with(context).setLoggingEnabled(true);
     }
 
     @Override
@@ -41,8 +42,8 @@ public class FeedItemAdapter extends RecyclerView.Adapter<FeedItemAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(FeedItemAdapter.ViewHolder holder, int position) {
-        Post post = posts.get(position);
+    public void onBindViewHolder(FeedItemAdapter.ViewHolder holder, final int position) {
+        final Post post = posts.get(position);
         holder.textView.setText(post.getText());
         if (StringUtils.isEmpty(post.getImgUrl())) {
             holder.imageView.setImageBitmap(null);
@@ -54,6 +55,16 @@ public class FeedItemAdapter extends RecyclerView.Adapter<FeedItemAdapter.ViewHo
             Picasso.with(context).load(post.getImgUrl()).fit().into(holder.imageView);
         }
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (itemLongClickListener != null) {
+                    itemLongClickListener.onItemLongClick(position, post);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -66,6 +77,25 @@ public class FeedItemAdapter extends RecyclerView.Adapter<FeedItemAdapter.ViewHo
         notifyItemRangeInserted(0, posts.size());
     }
 
+    public void onPostDeleted(Post deletedPost) {
+        int index = -1;
+        for (int i=0 ; i<posts.size() ; i++) {
+            if (posts.get(i).getKey().endsWith(deletedPost.getKey())) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            this.posts.remove(index);
+            notifyItemRemoved(index);
+        }
+    }
+
+    public void setItemLongClickListener(OnItemLongClickListener itemLongClickListener) {
+        this.itemLongClickListener = itemLongClickListener;
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView textView;
         FixedImageView imageView;
@@ -76,5 +106,9 @@ public class FeedItemAdapter extends RecyclerView.Adapter<FeedItemAdapter.ViewHo
             textView = ButterKnife.findById(itemView, R.id.text);
             imageView = ButterKnife.findById(itemView, R.id.image);
         }
+    }
+
+    interface OnItemLongClickListener {
+        void onItemLongClick(int position, Post post);
     }
 }

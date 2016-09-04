@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * @author : hienngo
@@ -39,10 +40,19 @@ public class FeedPresenter extends BasePresenter<FeedView> {
         }
     }
 
+    public void removePost(final Post post) {
+        dataService.removePost(post)
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        getView().onPostDeleted(post);
+                    }
+                });
+    }
+
     public void resumeSyncing() {
         if (subscription != null) return;
         Log.v(TAG, "resumeSyncing");
-
         subscription = dataService.startSyncingPost(lastSyncedTime, new Subscriber<List<Post>>() {
             @Override
             public void onCompleted() {
@@ -50,18 +60,29 @@ public class FeedPresenter extends BasePresenter<FeedView> {
 
             @Override
             public void onError(Throwable e) {
-                getView().showError();
+                getView().showError(e != null ? e.getMessage() : null);
             }
 
             @Override
             public void onNext(List<Post> posts) {
-                Log.v(TAG, "new post : " + posts.size());
-                Collections.reverse(posts);
-                if (lastSyncedTime != 0) {
-                    getView().showNewPostNotice();
+                Post.Status status = posts.get(0).getStatus();
+
+                if (status == Post.Status.Add) {
+                    Log.v(TAG, "new post : " + posts.size());
+                    Collections.reverse(posts);
+                    if (lastSyncedTime != 0) {
+                        getView().showNewPostNotice();
+                    }
+                    lastSyncedTime = posts.get(0).getCreated();
+                    getView().onReceiveNewPosts(posts);
+                } else if (status == Post.Status.Remove) {
+                    for (Post post : posts) {
+                        Log.v(TAG, "delete post : " + post);
+                        getView().onPostDeleted(post);
+                    }
                 }
-                lastSyncedTime = posts.get(0).getCreated();
-                getView().onReceiveNewPosts(posts);
+
+
             }
         });
     }

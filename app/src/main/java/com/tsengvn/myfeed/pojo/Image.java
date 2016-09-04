@@ -3,10 +3,13 @@ package com.tsengvn.myfeed.pojo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * @author : hienngo
  * @since : Sep 02, 2016.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Image implements Parcelable{
     private String id;
     private String title;

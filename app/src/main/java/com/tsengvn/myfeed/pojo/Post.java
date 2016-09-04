@@ -1,14 +1,26 @@
 package com.tsengvn.myfeed.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author : hienngo
  * @since : Sep 01, 2016.
  */
 public class Post {
+    public enum Status {
+        Add, Remove;
+    }
+
     private String text;
     private String imgUrl;
     private float imgRatio;
     private long created;
+
+    @JsonIgnore
+    private String key;
+
+    @JsonIgnore
+    private Status status;
 
     public Post() {
     }
@@ -52,6 +64,22 @@ public class Post {
         this.created = created;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,20 +87,25 @@ public class Post {
 
         Post post = (Post) o;
 
-        if (Float.compare(post.getImgRatio(), getImgRatio()) != 0) return false;
-        if (getCreated() != post.getCreated()) return false;
-        if (getText() != null ? !getText().equals(post.getText()) : post.getText() != null)
-            return false;
-        return getImgUrl() != null ? getImgUrl().equals(post.getImgUrl()) : post.getImgUrl() == null;
+        if (!getKey().equals(post.getKey())) return false;
+        return getStatus() == post.getStatus();
 
     }
 
     @Override
     public int hashCode() {
-        int result = getText() != null ? getText().hashCode() : 0;
-        result = 31 * result + (getImgUrl() != null ? getImgUrl().hashCode() : 0);
-        result = 31 * result + (getImgRatio() != +0.0f ? Float.floatToIntBits(getImgRatio()) : 0);
-        result = 31 * result + (int) (getCreated() ^ (getCreated() >>> 32));
+        int result = getKey().hashCode();
+        result = 31 * result + getStatus().hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "text='" + text + '\'' +
+                ", imgUrl='" + imgUrl + '\'' +
+                ", imgRatio=" + imgRatio +
+                ", created=" + created +
+                '}';
     }
 }

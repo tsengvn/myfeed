@@ -8,8 +8,6 @@ import com.tsengvn.myfeed.domain.repo.PostRepo;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.pojo.Post;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -19,8 +17,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.schedulers.Timestamped;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.ReplaySubject;
 
 /**
@@ -31,7 +27,8 @@ public class DataService {
     private final PostRepo postRepo;
     private final ImgurRepo imgurRepo;
 
-    private ReplaySubject<Post> syncSubject = null;
+    private ReplaySubject<Post> syncAddSubject = null;
+    private ReplaySubject<Post> syncDeleteSubject = null;
 
     public DataService(PostRepo postRepo, ImgurRepo imgurRepo) {
         this.postRepo = postRepo;
@@ -75,20 +72,15 @@ public class DataService {
     }
 
     public Subscription startSyncingPost(final long lastSyncedTime, Observer<List<Post>> observer) {
-        if (syncSubject == null) {
-            syncSubject = ReplaySubject.create();
+        if (syncAddSubject == null) {
+            syncAddSubject = ReplaySubject.create();
+            syncDeleteSubject = ReplaySubject.create();
             postRepo.addChildEventListener(childEventListener);
         }
-        return syncSubject
-                .asObservable()
-                .distinct()
-                .filter(new Func1<Post, Boolean>() {
-                    @Override
-                    public Boolean call(Post post) {
-                        return post.getCreated() > lastSyncedTime;
-                    }
-                })
-                .buffer(500, TimeUnit.MILLISECONDS, 100)
+        return Observable.merge(
+                        syncAddSubject.distinct().buffer(1, TimeUnit.SECONDS, 100),
+                        syncDeleteSubject.distinct().buffer(1, TimeUnit.SECONDS, 100)
+                )
                 .filter(new Func1<List<Post>, Boolean>() {
                     @Override
                     public Boolean call(List<Post> posts) {
@@ -101,17 +93,22 @@ public class DataService {
     }
 
     public void stopSyncingPost() {
-        syncSubject.onCompleted();
-        syncSubject = null;
+        syncAddSubject.onCompleted();
+        syncAddSubject = null;
+        syncDeleteSubject.onCompleted();
+        syncDeleteSubject = null;
+
         postRepo.removeChildEventListener(childEventListener);
     }
 
     private final ChildEventListener childEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            //not support
             Post post = dataSnapshot.getValue(Post.class);
-            syncSubject.onNext(post);
+            post.setStatus(Post.Status.Add);
+            post.setKey(dataSnapshot.getKey());
+
+            syncAddSubject.onNext(post);
         }
 
         @Override
@@ -121,7 +118,12 @@ public class DataService {
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-            //not support
+            Post post = dataSnapshot.getValue(Post.class);
+            post.setStatus(Post.Status.Remove);
+            post.setKey(dataSnapshot.getKey());
+
+            syncDeleteSubject.onNext(post);
+
         }
 
         @Override
@@ -134,4 +136,17 @@ public class DataService {
             //not support
         }
     };
+
+    public Observable<Boolean> removePost(Post post) {
+        return Observable.just(post)
+                .map(new Func1<Post, Boolean>() {
+                    @Override
+                    public Boolean call(Post post) {
+                        postRepo.remove(post);
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+    }
 }

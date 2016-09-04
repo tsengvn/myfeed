@@ -3,8 +3,6 @@ package com.tsengvn.myfeed.internal.di.module;
 import android.app.Application;
 import android.content.Context;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.tsengvn.myfeed.BuildConfig;
 import com.tsengvn.myfeed.domain.interactor.DataService;
 import com.tsengvn.myfeed.domain.repo.ImgurRepo;
@@ -20,7 +18,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 /**
  * @author : hienngo
@@ -68,7 +66,7 @@ public class AppModule {
                 .baseUrl(new StringBuilder().append(ImgurRepo.URL).append("/")
                         .append(ImgurRepo.API_VERSION).append("/").toString())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create())
                 .client(okHttpClient)
                 .build()
                 .create(ImgurRepo.class);
