@@ -25,8 +25,8 @@ public class DataService {
     private final PostRepo postRepo;
     private final ImgurRepo imgurRepo;
 
-    private ReplaySubject<Post> syncAddSubject = null;
-    private ReplaySubject<Post> syncDeleteSubject = null;
+    ReplaySubject<Post> syncAddSubject = null;
+    ReplaySubject<Post> syncDeleteSubject = null;
 
     public DataService(PostRepo postRepo, ImgurRepo imgurRepo) {
         this.postRepo = postRepo;
@@ -70,7 +70,7 @@ public class DataService {
     }
 
     public Observable<List<Post>> startSyncingPost(final long lastSyncedTime) {
-        if (syncAddSubject == null) {
+        if (syncAddSubject == null || syncDeleteSubject != null) {
             syncAddSubject = ReplaySubject.create();
             syncDeleteSubject = ReplaySubject.create();
             postRepo.addChildEventListener(childEventListener);

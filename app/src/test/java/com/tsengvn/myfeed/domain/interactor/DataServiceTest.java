@@ -1,5 +1,6 @@
 package com.tsengvn.myfeed.domain.interactor;
 
+import com.firebase.client.ChildEventListener;
 import com.tsengvn.myfeed.domain.repo.ImgurRepo;
 import com.tsengvn.myfeed.domain.repo.PostRepo;
 import com.tsengvn.myfeed.pojo.Image;
@@ -29,7 +30,10 @@ import rx.schedulers.Schedulers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -150,12 +154,29 @@ public class DataServiceTest {
 
     @Test
     public void testStartSyncingPost() throws Exception {
-//        dataService.startSyncingPost()
-    }
+        final Post post = new Post();
+        post.setKey("1");
+        post.setStatus(Post.Status.Add);
 
-    @Test
-    public void testStopSyncingPost() throws Exception {
+        dataService.startSyncingPost(0).subscribe(new Action1<List<Post>>() {
+            @Override
+            public void call(List<Post> posts) {
+                assertEquals(post, posts.get(0));
+                assertEquals(1, posts.size());
+            }
+        });
 
+        verify(postRepo, times(1)).addChildEventListener(any(ChildEventListener.class));
+        assertNotNull(dataService.syncAddSubject);
+        assertNotNull(dataService.syncDeleteSubject);
+
+        dataService.syncAddSubject.onNext(post);
+        dataService.syncAddSubject.onNext(post);
+
+        dataService.stopSyncingPost();
+        verify(postRepo, times(1)).removeChildEventListener(any(ChildEventListener.class));
+        assertNull(dataService.syncAddSubject);
+        assertNull(dataService.syncDeleteSubject);
     }
 
     @Test
