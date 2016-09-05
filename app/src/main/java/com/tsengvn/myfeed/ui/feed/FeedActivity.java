@@ -108,6 +108,8 @@ public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdap
 
     @Override
     public void showNewPostNotice() {
+        if (feedItemAdapter == null) return;
+
         Snackbar
                 .make(recyclerView, R.string.new_post_message, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.show, new View.OnClickListener() {

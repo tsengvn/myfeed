@@ -66,14 +66,13 @@ public class FeedPresenter extends BasePresenter<FeedView> {
             @Override
             public void onNext(List<Post> posts) {
                 Post.Status status = posts.get(0).getStatus();
+                lastSyncedTime = posts.get(0).getCreated();
 
                 if (status == Post.Status.Add) {
                     Log.v(TAG, "new post : " + posts.size());
+
                     Collections.reverse(posts);
-                    if (lastSyncedTime != 0) {
-                        getView().showNewPostNotice();
-                    }
-                    lastSyncedTime = posts.get(0).getCreated();
+                    getView().showNewPostNotice();
                     getView().onReceiveNewPosts(posts);
                 } else if (status == Post.Status.Remove) {
                     for (Post post : posts) {

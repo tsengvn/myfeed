@@ -78,7 +78,12 @@ public class DataService {
             postRepo.addChildEventListener(childEventListener);
         }
         return Observable.merge(
-                        syncAddSubject.distinct().buffer(1, TimeUnit.SECONDS, 100),
+                        syncAddSubject.distinct().filter(new Func1<Post, Boolean>() {
+                            @Override
+                            public Boolean call(Post post) {
+                                return post.getCreated() > lastSyncedTime;
+                            }
+                        }).buffer(1, TimeUnit.SECONDS, 100),
                         syncDeleteSubject.distinct().buffer(1, TimeUnit.SECONDS, 100)
                 )
                 .filter(new Func1<List<Post>, Boolean>() {
