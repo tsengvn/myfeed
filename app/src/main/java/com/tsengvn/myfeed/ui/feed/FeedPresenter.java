@@ -53,37 +53,38 @@ public class FeedPresenter extends BasePresenter<FeedView> {
     public void resumeSyncing() {
         if (subscription != null) return;
         Log.v(TAG, "resumeSyncing");
-        subscription = dataService.startSyncingPost(lastSyncedTime, new Subscriber<List<Post>>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                getView().showError(e != null ? e.getMessage() : null);
-            }
-
-            @Override
-            public void onNext(List<Post> posts) {
-                Post.Status status = posts.get(0).getStatus();
-                lastSyncedTime = posts.get(0).getCreated();
-
-                if (status == Post.Status.Add) {
-                    Log.v(TAG, "new post : " + posts.size());
-
-                    Collections.reverse(posts);
-                    getView().showNewPostNotice();
-                    getView().onReceiveNewPosts(posts);
-                } else if (status == Post.Status.Remove) {
-                    for (Post post : posts) {
-                        Log.v(TAG, "delete post : " + post);
-                        getView().onPostDeleted(post);
+        subscription = dataService.startSyncingPost(lastSyncedTime)
+                .subscribe(new Subscriber<List<Post>>() {
+                    @Override
+                    public void onCompleted() {
                     }
-                }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getView().showError(e != null ? e.getMessage() : null);
+                    }
+
+                    @Override
+                    public void onNext(List<Post> posts) {
+                        Post.Status status = posts.get(0).getStatus();
+                        lastSyncedTime = posts.get(0).getCreated();
+
+                        if (status == Post.Status.Add) {
+                            Log.v(TAG, "new post : " + posts.size());
+
+                            Collections.reverse(posts);
+                            getView().showNewPostNotice();
+                            getView().onReceiveNewPosts(posts);
+                        } else if (status == Post.Status.Remove) {
+                            for (Post post : posts) {
+                                Log.v(TAG, "delete post : " + post);
+                                getView().onPostDeleted(post);
+                            }
+                        }
 
 
-            }
-        });
+                    }
+                });
     }
 
     public void stopSyncing() {

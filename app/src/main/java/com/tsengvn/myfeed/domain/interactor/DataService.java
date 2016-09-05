@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.Observer;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -71,7 +69,7 @@ public class DataService {
 
     }
 
-    public Subscription startSyncingPost(final long lastSyncedTime, Observer<List<Post>> observer) {
+    public Observable<List<Post>> startSyncingPost(final long lastSyncedTime) {
         if (syncAddSubject == null) {
             syncAddSubject = ReplaySubject.create();
             syncDeleteSubject = ReplaySubject.create();
@@ -93,8 +91,7 @@ public class DataService {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(observer);
+                .subscribeOn(Schedulers.io());
     }
 
     public void stopSyncingPost() {

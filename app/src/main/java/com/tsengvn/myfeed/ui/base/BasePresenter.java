@@ -7,7 +7,7 @@ package com.tsengvn.myfeed.ui.base;
 public abstract class BasePresenter<V extends BaseView> {
     private V view;
 
-    void onTakeView(V view) {
+    public void onTakeView(V view) {
         this.view = view;
     }
 
