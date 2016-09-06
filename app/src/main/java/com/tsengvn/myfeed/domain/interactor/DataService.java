@@ -1,5 +1,7 @@
 package com.tsengvn.myfeed.domain.interactor;
 
+import android.util.Log;
+
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -8,12 +10,14 @@ import com.tsengvn.myfeed.domain.repo.PostRepo;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.pojo.Post;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.observables.GroupedObservable;
 import rx.schedulers.Schedulers;
 import rx.subjects.ReplaySubject;
 
@@ -25,8 +29,7 @@ public class DataService {
     private final PostRepo postRepo;
     private final ImgurRepo imgurRepo;
 
-    ReplaySubject<Post> syncAddSubject = null;
-    ReplaySubject<Post> syncDeleteSubject = null;
+    ReplaySubject<Post> syncSubject = null;
 
     public DataService(PostRepo postRepo, ImgurRepo imgurRepo) {
         this.postRepo = postRepo;
@@ -70,24 +73,44 @@ public class DataService {
     }
 
     public Observable<List<Post>> startSyncingPost(final long lastSyncedTime) {
-        if (syncAddSubject == null || syncDeleteSubject != null) {
-            syncAddSubject = ReplaySubject.create();
-            syncDeleteSubject = ReplaySubject.create();
+        if (syncSubject == null) {
+            syncSubject = ReplaySubject.create();
             postRepo.addChildEventListener(childEventListener);
         }
-        return Observable.merge(
-                        syncAddSubject.distinct().filter(new Func1<Post, Boolean>() {
-                            @Override
-                            public Boolean call(Post post) {
-                                return post.getCreated() > lastSyncedTime;
-                            }
-                        }).buffer(1, TimeUnit.SECONDS, 100),
-                        syncDeleteSubject.distinct().buffer(1, TimeUnit.SECONDS, 100)
-                )
+        return syncSubject
+                .groupBy(new Func1<Post, Post.Status>() {
+                    @Override
+                    public Post.Status call(Post post) {
+                        return post.getStatus();
+                    }
+                })
+                .flatMap(new Func1<GroupedObservable<Post.Status, Post>, Observable<List<Post>>>() {
+                    @Override
+                    public Observable<List<Post>> call(GroupedObservable<Post.Status, Post> statusPostGroupedObservable) {
+                        Log.v("@nmh", statusPostGroupedObservable.getKey().toString());
+                        return statusPostGroupedObservable
+                                .distinct()
+                                .filter(new Func1<Post, Boolean>() {
+                                    @Override
+                                    public Boolean call(Post post) {
+                                        return post.getCreated() > lastSyncedTime;
+                                    }
+                                })
+                                .asObservable()
+                                .buffer(1, TimeUnit.SECONDS);
+                    }
+                })
                 .filter(new Func1<List<Post>, Boolean>() {
                     @Override
                     public Boolean call(List<Post> posts) {
                         return posts.size() > 0;
+                    }
+                })
+                .map(new Func1<List<Post>, List<Post>>() {
+                    @Override
+                    public List<Post> call(List<Post> posts) {
+                        Collections.reverse(posts);
+                        return posts;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,10 +118,8 @@ public class DataService {
     }
 
     public void stopSyncingPost() {
-        syncAddSubject.onCompleted();
-        syncAddSubject = null;
-        syncDeleteSubject.onCompleted();
-        syncDeleteSubject = null;
+        syncSubject.onCompleted();
+        syncSubject = null;
 
         postRepo.removeChildEventListener(childEventListener);
     }
@@ -110,7 +131,7 @@ public class DataService {
             post.setStatus(Post.Status.Add);
             post.setKey(dataSnapshot.getKey());
 
-            syncAddSubject.onNext(post);
+            syncSubject.onNext(post);
         }
 
         @Override
@@ -124,7 +145,7 @@ public class DataService {
             post.setStatus(Post.Status.Remove);
             post.setKey(dataSnapshot.getKey());
 
-            syncDeleteSubject.onNext(post);
+            syncSubject.onNext(post);
 
         }
 

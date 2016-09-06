@@ -167,16 +167,14 @@ public class DataServiceTest {
         });
 
         verify(postRepo, times(1)).addChildEventListener(any(ChildEventListener.class));
-        assertNotNull(dataService.syncAddSubject);
-        assertNotNull(dataService.syncDeleteSubject);
+        assertNotNull(dataService.syncSubject);
 
-        dataService.syncAddSubject.onNext(post);
-        dataService.syncAddSubject.onNext(post);
+        dataService.syncSubject.onNext(post);
+        dataService.syncSubject.onNext(post);
 
         dataService.stopSyncingPost();
         verify(postRepo, times(1)).removeChildEventListener(any(ChildEventListener.class));
-        assertNull(dataService.syncAddSubject);
-        assertNull(dataService.syncDeleteSubject);
+        assertNull(dataService.syncSubject);
     }
 
     @Test

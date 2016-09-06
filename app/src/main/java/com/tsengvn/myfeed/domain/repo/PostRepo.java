@@ -72,14 +72,19 @@ public class PostRepo {
                             result.add(post);
                         }
                         Collections.reverse(result);
-                        subscriber.onNext(result);
-                        subscriber.onCompleted();
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(result);
+                            subscriber.onCompleted();
+                        }
                     }
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-                        subscriber.onError(firebaseError.toException());
-                        subscriber.onCompleted();
+
+                        if(!subscriber.isUnsubscribed()) {
+                            subscriber.onError(firebaseError.toException());
+                            subscriber.onCompleted();
+                        }
                     }
                 });
             }

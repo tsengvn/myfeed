@@ -40,6 +40,7 @@ public class FeedActivity extends BaseActivity<FeedPresenter> implements FeedVie
         setContentView(R.layout.activity_main);
 
         bindViews();
+
     }
 
     @Override

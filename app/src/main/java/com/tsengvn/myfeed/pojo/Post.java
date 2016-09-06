@@ -87,15 +87,16 @@ public class Post {
 
         Post post = (Post) o;
 
-        if (!getKey().equals(post.getKey())) return false;
+        if (getKey() != null ? !getKey().equals(post.getKey()) : post.getKey() != null)
+            return false;
         return getStatus() == post.getStatus();
 
     }
 
     @Override
     public int hashCode() {
-        int result = getKey().hashCode();
-        result = 31 * result + getStatus().hashCode();
+        int result = getKey() != null ? getKey().hashCode() : 0;
+        result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
         return result;
     }
 

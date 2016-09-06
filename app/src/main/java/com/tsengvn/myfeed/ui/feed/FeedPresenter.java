@@ -6,7 +6,6 @@ import com.tsengvn.myfeed.domain.interactor.DataService;
 import com.tsengvn.myfeed.pojo.Post;
 import com.tsengvn.myfeed.ui.base.BasePresenter;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -68,11 +67,10 @@ public class FeedPresenter extends BasePresenter<FeedView> {
                     public void onNext(List<Post> posts) {
                         Post.Status status = posts.get(0).getStatus();
                         lastSyncedTime = posts.get(0).getCreated();
-
+                        Log.v(TAG, "lastSyncedTime : " + lastSyncedTime);
                         if (status == Post.Status.Add) {
                             Log.v(TAG, "new post : " + posts.size());
 
-                            Collections.reverse(posts);
                             getView().showNewPostNotice();
                             getView().onReceiveNewPosts(posts);
                         } else if (status == Post.Status.Remove) {
