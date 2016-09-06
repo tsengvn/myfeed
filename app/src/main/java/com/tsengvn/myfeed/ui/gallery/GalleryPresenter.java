@@ -1,7 +1,5 @@
 package com.tsengvn.myfeed.ui.gallery;
 
-import android.util.Log;
-
 import com.tsengvn.myfeed.domain.interactor.DataService;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.ui.base.BasePresenter;
@@ -10,9 +8,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import rx.Observer;
+import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action1;
 
 /**
  * @author : hienngo
@@ -41,9 +38,18 @@ public class GalleryPresenter extends BasePresenter<GalleryView> {
 
     private void load() {
         subscription = service.loadImages(currentPage)
-                .subscribe(new Action1<List<Image>>() {
+                .subscribe(new Subscriber<List<Image>>() {
                     @Override
-                    public void call(List<Image> images) {
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getView().showError();
+                    }
+
+                    @Override
+                    public void onNext(List<Image> images) {
                         getView().onReceiveData(images, currentPage == 0);
                     }
                 });

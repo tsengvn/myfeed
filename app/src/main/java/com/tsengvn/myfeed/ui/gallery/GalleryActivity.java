@@ -3,6 +3,7 @@ package com.tsengvn.myfeed.ui.gallery;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -75,6 +76,12 @@ public class GalleryActivity extends BaseActivity<GalleryPresenter> implements G
         }
         imageAdapter.images.addAll(images);
         imageAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showError() {
+        Snackbar.make(recyclerView, R.string.error_occur, Snackbar.LENGTH_INDEFINITE)
+                .show();
     }
 
     private void createAdapter() {

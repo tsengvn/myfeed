@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface GalleryView extends BaseView {
     void onReceiveData(List<Image> images, boolean refresh);
+
+    void showError();
 }

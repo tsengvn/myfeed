@@ -24,7 +24,7 @@ public class FeedPresenter extends BasePresenter<FeedView> {
     private final DataService dataService;
 
     private Subscription subscription;
-    private long lastSyncedTime = 0;
+    private volatile long lastSyncedTime = 0;
 
     @Inject
     public FeedPresenter(DataService dataService) {
