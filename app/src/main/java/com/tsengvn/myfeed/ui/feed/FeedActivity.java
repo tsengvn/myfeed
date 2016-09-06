@@ -80,7 +80,7 @@ public class FeedActivity extends BaseActivity<FeedPresenter> implements FeedVie
     @Override
     public void showError(String message) {
         Snackbar
-                .make(recyclerView, message != null ? message : "Error, try again later.", Snackbar.LENGTH_INDEFINITE)
+                .make(recyclerView, message != null ? message : getString(R.string.error_occur), Snackbar.LENGTH_INDEFINITE)
                 .show();
     }
 
@@ -110,14 +110,6 @@ public class FeedActivity extends BaseActivity<FeedPresenter> implements FeedVie
                 })
                 .show();
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == 0 && resultCode == RESULT_OK) {
-//            showNewPostNotice();
-//        }
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
 
     public void openAddScreen() {
         startActivity(new Intent(this, AddActivity.class));
