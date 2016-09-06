@@ -1,13 +1,11 @@
 package com.tsengvn.myfeed.ui.gallery;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +15,10 @@ import com.tsengvn.myfeed.R;
 import com.tsengvn.myfeed.internal.di.component.AppComponent;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.ui.base.BaseActivity;
-import com.tsengvn.myfeed.ui.base.BasePresenter;
 import com.tsengvn.myfeed.ui.widget.FixedImageView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,15 +27,12 @@ import butterknife.ButterKnife;
  * @author : hienngo
  * @since : Sep 03, 2016.
  */
-public class GalleryActivity extends BaseActivity implements GalleryView{
+public class GalleryActivity extends BaseActivity<GalleryPresenter> implements GalleryView{
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-
-    @Inject
-    GalleryPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,7 +41,7 @@ public class GalleryActivity extends BaseActivity implements GalleryView{
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        presenter.loadData();
+        getPresenter().loadData();
     }
 
     @Override
@@ -65,17 +57,12 @@ public class GalleryActivity extends BaseActivity implements GalleryView{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.onDestroy();
+        getPresenter().onDestroy();
     }
 
     @Override
     protected void initInjector(AppComponent appComponent) {
         appComponent.inject(this);
-    }
-
-    @Override
-    public BasePresenter getPresenter() {
-        return presenter;
     }
 
     @Override
@@ -118,7 +105,7 @@ public class GalleryActivity extends BaseActivity implements GalleryView{
             Picasso.with(getApplicationContext()).load(image.getThumbnail()).fit().into(holder.imageView);
 
             if (position == images.size()-1) {
-                presenter.loadMore();
+                getPresenter().loadMore();
             }
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -7,18 +7,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.tsengvn.myfeed.R;
 import com.tsengvn.myfeed.internal.di.component.AppComponent;
 import com.tsengvn.myfeed.pojo.Image;
 import com.tsengvn.myfeed.ui.base.BaseActivity;
-import com.tsengvn.myfeed.ui.base.BasePresenter;
 import com.tsengvn.myfeed.ui.gallery.GalleryActivity;
 import com.tsengvn.myfeed.ui.widget.FixedImageView;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 
@@ -26,11 +22,8 @@ import butterknife.BindView;
  * @author : hienngo
  * @since : Sep 01, 2016.
  */
-public class AddActivity extends BaseActivity implements AddView {
+public class AddActivity extends BaseActivity<AddPresenter> implements AddView {
     private static final int REQ_PHOTO = 1;
-
-    @Inject
-    AddPresenter presenter;
 
     @BindView(R.id.input)
     EditText inputTextView;
@@ -58,11 +51,6 @@ public class AddActivity extends BaseActivity implements AddView {
     }
 
     @Override
-    public BasePresenter getPresenter() {
-        return presenter;
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_add, menu);
         return true;
@@ -76,7 +64,7 @@ public class AddActivity extends BaseActivity implements AddView {
             finish();
             return true;
         } else if (itemId == R.id.action_save) {
-            presenter.savePost(inputTextView.getText().toString(),
+            getPresenter().savePost(inputTextView.getText().toString(),
                     image != null ? image.getLink() : null,
                     image != null ? image.getRatio() : 0);
             return true;

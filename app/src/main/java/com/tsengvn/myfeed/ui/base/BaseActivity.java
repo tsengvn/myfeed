@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.tsengvn.myfeed.MyFeedApp;
 import com.tsengvn.myfeed.internal.di.component.AppComponent;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -15,8 +17,11 @@ import butterknife.Unbinder;
  * @author Hien Ngo
  * @since 7/27/16
  */
-public abstract class BaseActivity extends AppCompatActivity implements BaseView {
+public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
     private Unbinder unbinder;
+
+    @Inject P presenter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         initInjector(MyFeedApp.getAppComponent(this));
@@ -35,6 +40,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
         unbinder.unbind();
         getPresenter().onDestroyView();
         super.onDestroy();
+    }
+
+    @Override
+    final public P getPresenter() {
+        return presenter;
     }
 
     protected abstract void initInjector(AppComponent appComponent);

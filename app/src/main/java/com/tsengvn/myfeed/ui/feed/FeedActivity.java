@@ -16,16 +16,13 @@ import com.tsengvn.myfeed.internal.di.component.AppComponent;
 import com.tsengvn.myfeed.pojo.Post;
 import com.tsengvn.myfeed.ui.add.AddActivity;
 import com.tsengvn.myfeed.ui.base.BaseActivity;
-import com.tsengvn.myfeed.ui.base.BasePresenter;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 
 
-public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdapter.OnItemLongClickListener {
+public class FeedActivity extends BaseActivity<FeedPresenter> implements FeedView, FeedItemAdapter.OnItemLongClickListener {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
@@ -34,9 +31,6 @@ public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdap
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
-    @Inject
-    FeedPresenter feedPresenter;
 
     private FeedItemAdapter feedItemAdapter;
 
@@ -50,19 +44,19 @@ public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdap
 
     @Override
     protected void onStart() {
-        feedPresenter.resumeSyncing();
+        getPresenter().resumeSyncing();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        feedPresenter.pauseSyncing();
+        getPresenter().pauseSyncing();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        feedPresenter.stopSyncing();
+        getPresenter().stopSyncing();
         super.onDestroy();
     }
 
@@ -80,11 +74,6 @@ public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdap
     @Override
     protected void initInjector(AppComponent appComponent) {
         appComponent.inject(this);
-    }
-
-    @Override
-    public BasePresenter getPresenter() {
-        return feedPresenter;
     }
 
     @Override
@@ -148,7 +137,7 @@ public class FeedActivity extends BaseActivity implements FeedView, FeedItemAdap
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        feedPresenter.removePost(post);
+                        getPresenter().removePost(post);
                     }
                 })
                 .show();
