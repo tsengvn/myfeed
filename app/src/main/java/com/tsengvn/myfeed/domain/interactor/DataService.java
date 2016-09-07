@@ -2,9 +2,9 @@ package com.tsengvn.myfeed.domain.interactor;
 
 import android.util.Log;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.tsengvn.myfeed.domain.repo.ImgurRepo;
 import com.tsengvn.myfeed.domain.repo.PostRepo;
 import com.tsengvn.myfeed.pojo.Image;
@@ -155,7 +155,7 @@ public class DataService {
         }
 
         @Override
-        public void onCancelled(FirebaseError firebaseError) {
+        public void onCancelled(DatabaseError databaseError) {
             //not support
         }
     };

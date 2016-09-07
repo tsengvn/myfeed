@@ -1,6 +1,6 @@
 package com.tsengvn.myfeed.domain.interactor;
 
-import com.firebase.client.ChildEventListener;
+import com.google.firebase.database.ChildEventListener;
 import com.tsengvn.myfeed.domain.repo.ImgurRepo;
 import com.tsengvn.myfeed.domain.repo.PostRepo;
 import com.tsengvn.myfeed.pojo.Image;

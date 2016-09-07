@@ -44,9 +44,6 @@ public class FeedPresenterTest {
 
         feedPresenter = new FeedPresenter(dataService);
         feedPresenter.onTakeView(feedView);
-//        RoboSharedPreferences sharedPreferences = new RoboSharedPreferences(new HashMap<String, Map<String, Object>>(), "setting", Context.MODE_PRIVATE);
-//        when(mLoginView.getSettingPref()).thenReturn(sharedPreferences);
-//        when(mLoginView.getContext()).thenReturn(RuntimeEnvironment.application.getApplicationContext());
 
     }
 
